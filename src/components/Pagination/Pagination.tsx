@@ -17,6 +17,9 @@ export const Pagination: React.FC<Props> = ({
 }) => {
   const totalPages = Math.ceil(total / perPage);
 
+  const isPrevDisabled = totalPages === 0 || currentPage === 1;
+  const isNextDisabled = totalPages === 0 || currentPage === totalPages;
+
   const handlePageChange = (page: number) => {
     if (page !== currentPage && page >= 1 && page <= totalPages) {
       onPageChange(page);
@@ -39,7 +42,6 @@ export const Pagination: React.FC<Props> = ({
           const newPerPage = Number(e.target.value);
 
           onPerPageChange(newPerPage);
-          onPageChange(1);
         }}
       >
         {[3, 5, 10, 20].map(n => (
@@ -51,14 +53,16 @@ export const Pagination: React.FC<Props> = ({
 
       <ul className="pagination">
         {/* Prev button */}
-        <li className={currentPage === 1 ? 'disabled' : ''}>
+        <li className={isPrevDisabled ? 'disabled' : ''}>
           <a
             href="#"
             data-cy="prevLink"
-            aria-disabled={currentPage === 1}
+            aria-disabled={isPrevDisabled}
             onClick={e => {
               e.preventDefault();
-              handlePageChange(currentPage - 1);
+              if (!isPrevDisabled) {
+                handlePageChange(currentPage - 1);
+              }
             }}
           >
             «
@@ -71,6 +75,7 @@ export const Pagination: React.FC<Props> = ({
             <a
               href="#"
               data-cy="pageLink"
+              aria-current={page === currentPage ? 'page' : undefined}
               onClick={e => {
                 e.preventDefault();
                 handlePageChange(page);
@@ -86,10 +91,12 @@ export const Pagination: React.FC<Props> = ({
           <a
             href="#"
             data-cy="nextLink"
-            aria-disabled={currentPage === totalPages}
+            aria-disabled={isNextDisabled}
             onClick={e => {
               e.preventDefault();
-              handlePageChange(currentPage + 1);
+              if (!isNextDisabled) {
+                handlePageChange(currentPage + 1);
+              }
             }}
           >
             »
