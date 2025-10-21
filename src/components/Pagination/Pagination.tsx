@@ -23,7 +23,7 @@ export const Pagination: React.FC<Props> = ({
     }
   };
 
-  const firstItem = (currentPage - 1) * perPage + 1;
+  const firstItem = total === 0 ? 0 : (currentPage - 1) * perPage + 1;
   const lastItem = Math.min(currentPage * perPage, total);
 
   return (
@@ -35,7 +35,12 @@ export const Pagination: React.FC<Props> = ({
       <select
         data-cy="perPageSelector"
         value={perPage}
-        onChange={e => onPerPageChange(Number(e.target.value))}
+        onChange={e => {
+          const newPerPage = Number(e.target.value);
+
+          onPerPageChange(newPerPage);
+          onPageChange(1);
+        }}
       >
         {[3, 5, 10, 20].map(n => (
           <option key={n} value={n}>
@@ -46,14 +51,15 @@ export const Pagination: React.FC<Props> = ({
 
       <ul className="pagination">
         {/* Prev button */}
-        <li
-          className={currentPage === 1 ? 'disabled' : ''}
-          onClick={() => handlePageChange(currentPage - 1)}
-        >
+        <li className={currentPage === 1 ? 'disabled' : ''}>
           <a
             href="#"
             data-cy="prevLink"
-            aria-disabled={currentPage === 1 ? 'true' : 'false'}
+            aria-disabled={currentPage === 1}
+            onClick={e => {
+              e.preventDefault();
+              handlePageChange(currentPage - 1);
+            }}
           >
             «
           </a>
@@ -61,26 +67,30 @@ export const Pagination: React.FC<Props> = ({
 
         {/* Page links */}
         {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-          <li
-            key={page}
-            className={page === currentPage ? 'active' : ''}
-            onClick={() => handlePageChange(page)}
-          >
-            <a href="#" data-cy="pageLink">
+          <li key={page} className={page === currentPage ? 'active' : ''}>
+            <a
+              href="#"
+              data-cy="pageLink"
+              onClick={e => {
+                e.preventDefault();
+                handlePageChange(page);
+              }}
+            >
               {page}
             </a>
           </li>
         ))}
 
         {/* Next button */}
-        <li
-          className={currentPage === totalPages ? 'disabled' : ''}
-          onClick={() => handlePageChange(currentPage + 1)}
-        >
+        <li className={currentPage === totalPages ? 'disabled' : ''}>
           <a
             href="#"
             data-cy="nextLink"
-            aria-disabled={currentPage === totalPages ? 'true' : 'false'}
+            aria-disabled={currentPage === totalPages}
+            onClick={e => {
+              e.preventDefault();
+              handlePageChange(currentPage + 1);
+            }}
           >
             »
           </a>
